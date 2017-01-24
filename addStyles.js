@@ -18,7 +18,7 @@ var stylesInDom = {},
 	}),
 	singletonElement = null,
 	singletonCounter = 0,
-	styleElementsInsertedAtTop = [];
+	styleElementsInserted = [];
 
 module.exports = function(list, options) {
 	if(typeof DEBUG !== "undefined" && DEBUG) {
@@ -90,7 +90,7 @@ function listToStyles(list) {
 		var css = item[1];
 		var media = item[2];
 		var sourceMap = item[3];
-		var part = {css: css, media: media, sourceMap: sourceMap};
+		var part = {id: id, css: css, media: media, sourceMap: sourceMap};
 		if(!newStyles[id])
 			styles.push(newStyles[id] = {id: id, parts: [part]});
 		else
@@ -101,18 +101,32 @@ function listToStyles(list) {
 
 function insertStyleElement(options, styleElement) {
 	var head = getHeadElement();
-	var lastStyleElementInsertedAtTop = styleElementsInsertedAtTop[styleElementsInsertedAtTop.length - 1];
+	var lastStyleElementInserted = styleElementsInserted[styleElementsInserted.length - 1];
 	if (options.insertAt === "top") {
-		if(!lastStyleElementInsertedAtTop) {
+		if(!lastStyleElementInserted) {
 			head.insertBefore(styleElement, head.firstChild);
-		} else if(lastStyleElementInsertedAtTop.nextSibling) {
-			head.insertBefore(styleElement, lastStyleElementInsertedAtTop.nextSibling);
+		} else if(lastStyleElementInserted.nextSibling) {
+			head.insertBefore(styleElement, lastStyleElementInserted.nextSibling);
 		} else {
 			head.appendChild(styleElement);
 		}
-		styleElementsInsertedAtTop.push(styleElement);
+		styleElementsInserted.push(styleElement);
 	} else if (options.insertAt === "bottom") {
 		head.appendChild(styleElement);
+	} else if (options.insertAt === 'byId') { // @todo for singleton
+		if(!lastStyleElementInserted) {
+			head.appendChild(styleElement);
+			styleElementsInserted.push(styleElement);
+		} else {
+			var index = styleElementsInserted.length - 1;
+			var id = +styleElement.getAttribute('data-id');
+			var lastId;
+			while (id < (lastId = lastStyleElementInserted.getAttribute('data-id')))
+				lastStyleElementInserted = styleElementsInserted[--index];
+
+			head.insertBefore(styleElement, lastStyleElementInserted ? lastStyleElementInserted.nextSibling : styleElementsInserted[0]);
+			styleElementsInserted.splice(index + 1, 0, styleElement);
+		}
 	} else {
 		throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
 	}
@@ -120,15 +134,16 @@ function insertStyleElement(options, styleElement) {
 
 function removeStyleElement(styleElement) {
 	styleElement.parentNode.removeChild(styleElement);
-	var idx = styleElementsInsertedAtTop.indexOf(styleElement);
+	var idx = styleElementsInserted.indexOf(styleElement);
 	if(idx >= 0) {
-		styleElementsInsertedAtTop.splice(idx, 1);
+		styleElementsInserted.splice(idx, 1);
 	}
 }
 
-function createStyleElement(options) {
+function createStyleElement(obj, options) {
 	var styleElement = document.createElement("style");
 	styleElement.type = "text/css";
+	styleElement.setAttribute('data-id', obj.id);
 	insertStyleElement(options, styleElement);
 	return styleElement;
 }
@@ -138,11 +153,11 @@ function addStyle(obj, options) {
 
 	if (options.singleton) {
 		var styleIndex = singletonCounter++;
-		styleElement = singletonElement || (singletonElement = createStyleElement(options));
+		styleElement = singletonElement || (singletonElement = createStyleElement(obj, options));
 		update = applyToSingletonTag.bind(null, styleElement, styleIndex, false);
 		remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true);
 	} else {
-		styleElement = createStyleElement(options);
+		styleElement = createStyleElement(obj, options);
 		update = applyToTag.bind(null, styleElement);
 		remove = function() {
 			removeStyleElement(styleElement);
