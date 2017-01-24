@@ -1,6 +1,6 @@
-# vue-style-loader
+# vision-style-loader
 
-> This is a fork of [style-loader](https://github.com/webpack/style-loader), fixing the issue that root-relative URLs are interpreted against chrome:// urls.
+> This is a fork of [vue-style-loader](https://github.com/vuejs/vue-style-loader), ensure style tag inserted order by module id.
 
 ## Usage
 

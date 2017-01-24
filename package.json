@@ -1,6 +1,6 @@
 {
-  "name": "vue-style-loader",
-  "version": "1.0.0",
+  "name": "vision-style-loader",
+  "version": "0.1.0",
   "author": "Tobias Koppers @sokra",
   "description": "style loader module for webpack",
   "devDependencies": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:vuejs/vue-style-loader.git"
+    "url": "vision-app/vision-style-loader.git"
   },
   "license": "MIT",
   "dependencies": {
