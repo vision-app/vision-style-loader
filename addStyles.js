@@ -81,6 +81,14 @@ function addStylesToDom(styles, options) {
 	}
 }
 
+function getSort(id, path) {
+	if (!path.includes('node_modules') && !path.includes('~/') && !path.includes('packages'))
+		id += 10000;
+	if (!path.includes('base.vue'))
+		id += 1000;
+	return id;
+}
+
 function listToStyles(list) {
 	var styles = [];
 	var newStyles = {};
@@ -90,7 +98,8 @@ function listToStyles(list) {
 		var css = item[1];
 		var media = item[2];
 		var sourceMap = item[3];
-		var part = {id: id, css: css, media: media, sourceMap: sourceMap};
+
+		var part = {sort: getSort(id, sourceMap.sources[0]), css: css, media: media, sourceMap: sourceMap};
 		if(!newStyles[id])
 			styles.push(newStyles[id] = {id: id, parts: [part]});
 		else
@@ -102,33 +111,18 @@ function listToStyles(list) {
 function insertStyleElement(options, styleElement) {
 	var head = getHeadElement();
 	var lastStyleElementInserted = styleElementsInserted[styleElementsInserted.length - 1];
-	if (options.insertAt === "top") {
-		if(!lastStyleElementInserted) {
-			head.insertBefore(styleElement, head.firstChild);
-		} else if(lastStyleElementInserted.nextSibling) {
-			head.insertBefore(styleElement, lastStyleElementInserted.nextSibling);
-		} else {
-			head.appendChild(styleElement);
-		}
-		styleElementsInserted.push(styleElement);
-	} else if (options.insertAt === "bottom") {
+	if(!lastStyleElementInserted) {
 		head.appendChild(styleElement);
-	} else if (options.insertAt === 'byId') { // @todo for singleton
-		if(!lastStyleElementInserted) {
-			head.appendChild(styleElement);
-			styleElementsInserted.push(styleElement);
-		} else {
-			var index = styleElementsInserted.length - 1;
-			var id = +styleElement.getAttribute('data-id');
-			var lastId;
-			while (id < (lastId = lastStyleElementInserted.getAttribute('data-id')))
-				lastStyleElementInserted = styleElementsInserted[--index];
-
-			head.insertBefore(styleElement, lastStyleElementInserted ? lastStyleElementInserted.nextSibling : styleElementsInserted[0]);
-			styleElementsInserted.splice(index + 1, 0, styleElement);
-		}
+		styleElementsInserted.push(styleElement);
 	} else {
-		throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
+		var index = styleElementsInserted.length - 1;
+		var sort = +styleElement.getAttribute('data-sort');
+		var lastSort;
+		while (lastStyleElementInserted && sort < (lastSort = lastStyleElementInserted.getAttribute('data-sort')))
+			lastStyleElementInserted = styleElementsInserted[--index];
+
+		head.insertBefore(styleElement, lastStyleElementInserted ? lastStyleElementInserted.nextSibling : styleElementsInserted[0]);
+		styleElementsInserted.splice(index + 1, 0, styleElement);
 	}
 }
 
@@ -143,7 +137,7 @@ function removeStyleElement(styleElement) {
 function createStyleElement(obj, options) {
 	var styleElement = document.createElement("style");
 	styleElement.type = "text/css";
-	styleElement.setAttribute('data-id', obj.id);
+	styleElement.setAttribute('data-sort', obj.sort);
 	insertStyleElement(options, styleElement);
 	return styleElement;
 }
