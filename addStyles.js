@@ -82,6 +82,7 @@ function addStylesToDom(styles, options) {
 }
 
 function getSort(id, path) {
+	path = path || '';
 	if (!path.includes('node_modules') && !path.includes('~/') && !path.includes('packages'))
 		id += 10000;
 	if (!path.includes('base.vue'))
@@ -99,7 +100,7 @@ function listToStyles(list) {
 		var media = item[2];
 		var sourceMap = item[3];
 
-		var part = {sort: getSort(id, sourceMap.sources[0]), css: css, media: media, sourceMap: sourceMap};
+		var part = {sort: getSort(id, sourceMap && sourceMap.sources[0]), css: css, media: media, sourceMap: sourceMap};
 		if(!newStyles[id])
 			styles.push(newStyles[id] = {id: id, parts: [part]});
 		else
