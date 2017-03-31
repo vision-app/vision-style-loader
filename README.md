@@ -1,6 +1,12 @@
-# vision-style-loader
+# vusion-style-loader
 
 > This is a fork of [vue-style-loader](https://github.com/vuejs/vue-style-loader), ensure style tag inserted order by module id.
+
+## Modifications
+
+- Sort style tags by some rules. (bad code)
+
+## Origins
 
 ## Usage
 

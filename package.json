@@ -1,5 +1,5 @@
 {
-  "name": "vision-style-loader",
+  "name": "vusion-style-loader",
   "version": "0.1.2",
   "author": "Tobias Koppers @sokra",
   "description": "style loader module for webpack",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "vision-app/vision-style-loader.git"
+    "url": "vusion/vusion-style-loader.git"
   },
   "license": "MIT",
   "dependencies": {
