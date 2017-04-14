@@ -83,11 +83,18 @@ function addStylesToDom(styles, options) {
 
 function getSort(id, path) {
 	path = path || '';
-	if (!path.includes('node_modules') && !path.includes('~/') && !path.includes('packages'))
-		id += 10000;
-	if (!path.includes('base.vue'))
-		id += 1000;
-	return id;
+
+	let weight = 0;
+	if (path.includes('base.vue'))
+		weight += 1000;
+	if (/node_modules/.test(path))
+		weight += 10000;
+	if (/node_modules\/[\w\d-]+\.vue/.test(path))
+		weight += 1000;
+	if (path.includes('normalize.css'))
+		weight += 5000;
+
+	return id + (20000 - weight);
 }
 
 function listToStyles(list) {
