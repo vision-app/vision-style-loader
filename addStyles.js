@@ -84,7 +84,7 @@ function addStylesToDom(styles, options) {
 function getSort(id, path) {
 	path = path || '';
 
-	let weight = 0;
+	var weight = 0;
 	if (path.includes('base.vue'))
 		weight += 1000;
 	if (/node_modules/.test(path))
