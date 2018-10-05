@@ -12,6 +12,14 @@
   },
   "license": "MIT",
   "dependencies": {
-    "loader-utils": "^0.2.7"
+    "hash-sum": "^1.0.2",
+    "loader-utils": "^1.0.2"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-jest": "^22.1.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
+    "conventional-changelog-cli": "^2.0.1",
+    "jest": "^22.1.4"
   }
 }
