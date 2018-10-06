@@ -3,9 +3,6 @@
   "version": "0.1.4",
   "author": "Tobias Koppers @sokra",
   "description": "style loader module for webpack",
-  "devDependencies": {
-    "css-loader": "~0.8.0"
-  },
   "repository": {
     "type": "git",
     "url": "vusion/vusion-style-loader.git"
